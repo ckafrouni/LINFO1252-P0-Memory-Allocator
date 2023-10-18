@@ -18,6 +18,9 @@ void my_init()
 
     *start = METADATA_SIZE; // offset to first free block
 
+    // TODO : Il ne faut plus prendre en compte le footer
+    // TODO : plus besoin de bit de poids faible.
+    
     uint16_t block_size = HEAP_SIZE - 1 * METADATA_SIZE;
     *(block + 0) = block_size;                    // block size (in bytes)
     *(block + 1) = 0;                             // offset to next free block (0)
@@ -28,7 +31,9 @@ void *my_malloc(size_t size)
 {
     const uint16_t METADATA_SIZE = 2;
     const uint16_t MIN_BLOCK_SIZE = 3 * METADATA_SIZE;
+    // TODO : plus besoin de bit de poids faible.
 
+    // TODO : la taille impair est acceptée, ainsi que plus besoin de footer.
     size += 2 * METADATA_SIZE; // Additional words for metadata
     size = size < MIN_BLOCK_SIZE ? MIN_BLOCK_SIZE : size;
     size = (size + 1) & ~1; // rounding to nearest even size
@@ -47,6 +52,7 @@ void *my_malloc(size_t size)
 
             if (remaining_size >= MIN_BLOCK_SIZE)
             {
+                // TODO : Il ne faut plus prendre en compte le footer
                 // Split block
                 new_block = current + (size / 2);
                 *(new_block + 0) = remaining_size;
@@ -73,6 +79,7 @@ void *my_malloc(size_t size)
                 *(prev + 1) = new_block == NULL ? *(current + 1) : (uint8_t *)new_block - (uint8_t *)prev;
             }
 
+            // TODO : Il ne faut plus prendre en compte le footer
             // Update current block
             *(current + 0) = size | 1;
             *(current + (size / 2) - 1) = size | 1;
