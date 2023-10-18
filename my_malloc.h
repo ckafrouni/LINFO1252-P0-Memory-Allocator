@@ -1,7 +1,6 @@
 #ifndef MY_MALLOC_H
 #define MY_MALLOC_H
 
-#include <stddef.h>
 #include <stdint.h>
 
 extern uint8_t MY_HEAP[64000];
