@@ -143,3 +143,48 @@ void my_free(void *pointer)
     }
     *(ptr + 1) = current == NULL ? 0 : (uint8_t *)current - (uint8_t *)ptr;
 }
+
+void my_free2 (void* pointer) {
+    // Inginious constant
+    const uint16_t HEAP_SIZE = 64000;
+
+    // Start of the heap
+    uint16_t *start = (uint16_t *)MY_HEAP;
+
+    // Pointer to the element to free
+    uint16_t *ptr_old_block = ((uint16_t *)pointer) - 1;
+
+    // Calculate offset of the element to free
+    uint16_t offset = (uint8_t *)ptr_old_block - (uint8_t *)start;
+    if (offset > HEAP_SIZE) return -1;
+
+    // Find previous and next free elements
+    uint16_t* ptr_previous_free = (uint16_t *)1;
+    uint16_t* ptr_next_free = (uint16_t *)start;
+    do {
+        if ((ptr_previous_free - start) < offset && offset < (ptr_next_free - start)) break;
+        ptr_previous_free = ptr_next_free;
+        ptr_next_free = (uint16_t *)*ptr_next_free;
+    } while (*ptr_next_free != 0);
+
+    // Reorganizing pointers
+    *(ptr_old_block + 1) = *ptr_next_free;
+
+    // Is merger with next required ?
+    if (offset + *(ptr_old_block) == ((uint8_t *)ptr_next_free - (uint8_t *)start)){
+        // Add next_free size to old size
+        *ptr_old_block += *ptr_next_free;
+        // Old point to next of next
+        *(ptr_old_block + 1) = *(ptr_next_free + 1);
+    }
+
+    // Is merger with previous required ?
+    if ((((uint8_t *)ptr_previous_free - (uint8_t *)start) + *(ptr_previous_free)) == offset) {
+        // Add old size to previous_free size
+        *(ptr_previous_free) += *(ptr_old_block);
+        // Point to the next of next_free if there was a merger with the next_free
+        *(ptr_previous_free + 1) = *(ptr_old_block + 1);
+    } else {
+        *(ptr_previous_free + 1) = offset;
+    }
+}
