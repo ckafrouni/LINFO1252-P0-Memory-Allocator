@@ -74,62 +74,6 @@ void *my_malloc(size_t size)
     return NULL;
 }
 
-void _my_free(void *pointer)
-{
-    const uint16_t HEAP_SIZE = 64000;
-
-    uint16_t *ptr = ((uint16_t *)pointer) - 1; // ptr to header
-
-    uint16_t size = *ptr & ~1;
-    *ptr = size;
-    *(ptr + (*ptr / 2) - 1) = size;
-
-    uint16_t *start = (uint16_t *)MY_HEAP;
-    uint16_t offset_from_start = (uint8_t *)ptr - (uint8_t *)start;
-
-    // combine with block on the left if free
-    if (ptr != (start + 1) && !(*(ptr - 1) & 1))
-    {
-        uint16_t prev_size = *(ptr - 1);
-        uint16_t *prev = ptr - (prev_size / 2);
-        size += prev_size;
-        *prev = size;
-        *(prev + (size / 2) - 1) = size;
-        ptr = prev;
-        offset_from_start = (uint8_t *)ptr - (uint8_t *)start;
-    }
-
-    // combine with block on the right if free
-    if (offset_from_start + size != HEAP_SIZE && !(*(ptr + (size / 2)) & 1))
-    {
-        uint16_t *next = ptr + (size / 2);
-        uint16_t next_size = *next;
-        size += next_size;
-        *ptr = size;
-        *(ptr + (size / 2) - 1) = size;
-    }
-
-    uint16_t *current = (uint16_t *)MY_HEAP + (*start / 2);
-    uint16_t *prev = NULL;
-
-    // We look for the previous free block
-    while (current != NULL && (uint8_t *)ptr >= (uint8_t *)current)
-    {
-        prev = current;
-        current = *(current + 1) == 0 ? NULL : current + *(current + 1) / 2;
-        // if current == NULL -> we got to the end
-    }
-
-    if (prev == NULL)
-    {
-        *start = offset_from_start;
-    }
-    else
-    {
-        *(prev + 1) = (uint8_t *)ptr - (uint8_t *)prev;
-    }
-    *(ptr + 1) = current == NULL ? 0 : (uint8_t *)current - (uint8_t *)ptr;
-}
 
 void my_free(void *pointer)
 {
@@ -148,14 +92,14 @@ void my_free(void *pointer)
         return;
 
     // Find previous and next free elements
-    uint16_t *ptr_previous_free = (uint16_t *)1;
+    uint16_t *ptr_previous_free = (uint16_t *)1; // CHRIS: Pourquoi ?
     uint16_t *ptr_next_free = (uint16_t *)((uint8_t *)start + *start);
     do
     {
         if ((ptr_previous_free - start) < offset && offset < (ptr_next_free - start))
             break;
         ptr_previous_free = ptr_next_free;
-        ptr_next_free = (uint16_t *)*ptr_next_free;
+        ptr_next_free = (uint16_t *)ptr_next_free;
     } while (*ptr_next_free != 0);
 
     // Reorganizing pointers
@@ -183,3 +127,58 @@ void my_free(void *pointer)
         *(ptr_previous_free + 1) = offset;
     }
 }
+
+// // Générer avec ai
+// void my_free(void *pointer)
+// {
+//     const uint16_t HEAP_SIZE = 64000;
+
+//     // Start of the heap
+//     uint16_t *start = (uint16_t *)MY_HEAP;
+
+//     // Pointer to the block to free
+//     uint16_t *block_to_free = ((uint16_t *)pointer) - 1;
+
+//     // Calculate offset of the block to free
+//     uint16_t offset = (uint8_t *)block_to_free - MY_HEAP;
+//     if (offset >= HEAP_SIZE)
+//         return;
+
+//     // Find previous and next free blocks
+//     uint16_t *prev_free_block = NULL;
+//     uint16_t *next_free_block = (uint16_t *)(MY_HEAP + *start);
+
+//     while (next_free_block && ((uint8_t *)next_free_block - MY_HEAP) < offset)
+//     {
+//         prev_free_block = next_free_block;
+//         next_free_block = *(next_free_block + 1) ? (uint16_t *)(MY_HEAP + *(next_free_block + 1)) : NULL;
+//     }
+
+//     // Insert the freed block in the correct position
+//     if (prev_free_block)
+//     {
+//         *(prev_free_block + 1) = offset;
+//     }
+//     else
+//     {
+//         *start = offset;
+//     }
+
+//     *(block_to_free + 1) = next_free_block ? ((uint8_t *)next_free_block - (uint8_t *)(block_to_free) ) : 0;
+
+//     // Merge with next block if possible
+//     if (next_free_block && offset + *block_to_free == (uint8_t *)next_free_block - MY_HEAP)
+//     {
+//         *block_to_free += *next_free_block;
+//         *(block_to_free + 1) = *(next_free_block + 1);
+//     }
+
+//     // Merge with previous block if possible
+//     if (prev_free_block && ((uint8_t *)prev_free_block - MY_HEAP) + *prev_free_block == offset)
+//     {
+//         *prev_free_block += *block_to_free;
+//         *(prev_free_block + 1) = *(block_to_free + 1);
+//     }
+// }
+
+

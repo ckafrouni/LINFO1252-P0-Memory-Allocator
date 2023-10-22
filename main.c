@@ -20,7 +20,6 @@
  */
 void print_all_blocks()
 {
-    // const uint16_t METADATA_SIZE = 2;
     uint16_t *s = (uint16_t *)MY_HEAP;
     uint16_t *current = (uint16_t *)(MY_HEAP + *s);
 
@@ -30,9 +29,10 @@ void print_all_blocks()
     printf("\033[34m------------------\n");
 
     int n = 0;
+    int nMax = 10;
     while ((uint8_t *)current < MY_HEAP + sizeof(MY_HEAP))
     {
-        uint16_t size = *current; // Mask out the lowest bit to get the size
+        uint16_t size = *current;
         uint16_t offset_from_start = (uint8_t *)current - (uint8_t *)MY_HEAP;
         uint16_t next_offset = *(current + 1);
 
@@ -44,7 +44,8 @@ void print_all_blocks()
         printf("\033[33mnext offset =\033[0;1m %u\n", next_offset);
         
         n++;
-        current = (uint16_t *)((uint8_t *)current + size); // Move to the next block based on the size
+        current = (uint16_t *)((uint8_t *)current + next_offset);
+        if (n == nMax || next_offset == 0) break;
     }
 
     printf("\033[34m==================\n\n\033[0m");
@@ -61,6 +62,7 @@ int main()
     print_all_blocks();
     strcpy(p, "Hello");
     printf("strcpy(p, \"Hello\");\n");
+    printf("%s\n", p);
     print_all_blocks();
 
     char *q = (char *)my_malloc(7);
@@ -73,13 +75,15 @@ int main()
     printf("char *pq = (char *)my_malloc(12);\nsprintf(pq, \"%%s %%s\", p, q);\n");
     print_all_blocks();
 
+    printf("%d\n", *(uint16_t *)(MY_HEAP + 2));
     my_free(p);
+    printf("%d\n", *(uint16_t *)(MY_HEAP + 2));
     printf("my_free(p);\n");
     print_all_blocks();
 
-    // my_free(q);
-    // printf("my_free(q);\n");
-    // print_all_blocks();
+    my_free(q);
+    printf("my_free(q);\n");
+    print_all_blocks();
 
     // p = (char *)my_malloc(6);
     // strcpy(p, "Hello");
