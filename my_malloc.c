@@ -5,13 +5,42 @@
 
 #include "my_malloc.h"
 
-uint8_t MY_HEAP[64000];
+#define HEAP_SIZE 64000
+
+#define METADATA_SIZE 2
+#define MIN_BLOCK_SIZE (2 * METADATA_SIZE) // header, and next offset
+
+uint8_t MY_HEAP[HEAP_SIZE];
+
+/**
+ * Test : my_malloc() et my_free() de gros blocs
+ * => échoué (0/1) pts)
+ * Info:
+ * Your code produced a segfault.
+ * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
+ * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
+ * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
+ * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
+ * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
+ * — Une suite de my_malloc()/my_free() dont le total de mémoire allouée est supérieur
+ *   à la mémoire disponible a été mal géré par votre programme.
+ *   (Libérez-vous correctement vos blocs ?)
+ *
+ * Test : my_malloc() et my_free() de gros blocs, certains blocs sont remplis avec des 0
+ * => échoué (0/1) pts)
+ * Info: Your code produced a segfault.
+ * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
+ * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
+ * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
+ * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
+ * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
+ * — Une suite de my_malloc()/my_free() dont le total de mémoire allouée est supérieur à la
+ *   mémoire disponible a été mal géré par votre programme.
+ *   (Libérez-vous correctement vos blocs ?)
+ */
 
 void my_init()
 {
-    const uint16_t METADATA_SIZE = 2;
-    const uint16_t HEAP_SIZE = 64000;
-
     // Initialize start block to point to 1st free block
     uint16_t *start = (uint16_t *)MY_HEAP;
     uint16_t *block = (uint16_t *)(MY_HEAP + 1 * METADATA_SIZE);
@@ -25,9 +54,6 @@ void my_init()
 
 void *my_malloc(size_t size)
 {
-    const uint16_t METADATA_SIZE = 2;
-    const uint16_t MIN_BLOCK_SIZE = 2 * METADATA_SIZE; // header, and next offset
-
     size += 1 * METADATA_SIZE; // Additional words for header
     size = size < MIN_BLOCK_SIZE ? MIN_BLOCK_SIZE : size;
 
@@ -84,8 +110,6 @@ void *my_malloc(size_t size)
 
 void my_free(void *pointer)
 {
-    const uint16_t HEAP_SIZE = 64000;
-
     uint16_t *start = (uint16_t *)MY_HEAP;
     uint16_t *old_block = ((uint16_t *)pointer) - 1;
 
