@@ -28,6 +28,9 @@ void print_all_blocks()
     printf("1st free block's offset = %u\n", *s);
     printf("\033[34m------------------\n");
 
+    if (*s == 0)
+        return;
+
     int n = 0;
     int nMax = 10;
     while ((uint8_t *)current < MY_HEAP + sizeof(MY_HEAP))
@@ -54,6 +57,19 @@ void print_all_blocks()
 
 int main()
 {
+    my_init();
+    printf("my_init()\n");
+    print_all_blocks();
+
+    size_t available = sizeof(MY_HEAP) - 2;
+    printf("available : %lu\n", available);
+
+    size_t size = available - 2;
+    printf("size : %lu\n", size);
+    char *wtf = (char *)my_malloc(size);
+    print_all_blocks();
+    (void)wtf;
+
     my_init();
     printf("my_init()\n");
     print_all_blocks();
@@ -98,6 +114,7 @@ int main()
 
     char *a = (char *)my_malloc(10);
     print_all_blocks();
+    (void)a;
 
     my_free(pq);
     printf("my_free(pq);\n");

@@ -54,7 +54,12 @@ void *my_malloc(size_t size)
             if (prev == NULL)
             {
                 // (prev == NULL) only at the first iteration
+                size_t old_start_offset = *start;
                 *start = new_block == NULL ? *start + *(current + 1) : (uint8_t *)new_block - MY_HEAP; // offset from MY_HEAP
+                if (old_start_offset == *start)
+                {
+                    *start = 0;
+                }
             }
             else
             {
