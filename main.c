@@ -75,15 +75,16 @@ int main()
     printf("char *pq = (char *)my_malloc(12);\nsprintf(pq, \"%%s %%s\", p, q);\n");
     print_all_blocks();
 
+    my_free(q);
+    printf("my_free(q);\n");
+    print_all_blocks();
+
     printf("%d\n", *(uint16_t *)(MY_HEAP + 2));
     my_free(p);
     printf("%d\n", *(uint16_t *)(MY_HEAP + 2));
     printf("my_free(p);\n");
     print_all_blocks();
 
-    my_free(q);
-    printf("my_free(q);\n");
-    print_all_blocks();
 
     // p = (char *)my_malloc(6);
     // strcpy(p, "Hello");
@@ -98,9 +99,9 @@ int main()
     // char *a = (char *)my_malloc(10);
     // print_all_blocks();
 
-    // my_free(pq);
-    // printf("my_free(pq);\n");
-    // print_all_blocks();
+    my_free(pq);
+    printf("my_free(pq);\n");
+    print_all_blocks();
 
     return 0;
 }

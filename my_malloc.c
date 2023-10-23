@@ -74,111 +74,53 @@ void *my_malloc(size_t size)
     return NULL;
 }
 
-
 void my_free(void *pointer)
 {
-    // Inginious constant
     const uint16_t HEAP_SIZE = 64000;
 
-    // Start of the heap
     uint16_t *start = (uint16_t *)MY_HEAP;
+    uint16_t *old_block = ((uint16_t *)pointer) - 1;
 
-    // Pointer to the element to free
-    uint16_t *ptr_old_block = ((uint16_t *)pointer) - 1;
-
-    // Calculate offset of the element to free
-    uint16_t offset = (uint8_t *)ptr_old_block - (uint8_t *)start;
-    if (offset > HEAP_SIZE)
+    // Old block's offset
+    uint16_t old_block_offset = (uint8_t *)old_block - MY_HEAP;
+    if (old_block_offset > HEAP_SIZE || old_block_offset < 2)
         return;
 
-    // Find previous and next free elements
-    uint16_t *ptr_previous_free = (uint16_t *)1; // CHRIS: Pourquoi ?
-    uint16_t *ptr_next_free = (uint16_t *)((uint8_t *)start + *start);
-    do
+    // Find surrounding free blocks
+    uint16_t *prev_free_block = NULL;
+    uint16_t *next_free_block = (uint16_t *)(MY_HEAP + *start);
+    while (next_free_block < old_block)
     {
-        if ((ptr_previous_free - start) < offset && offset < (ptr_next_free - start))
-            break;
-        ptr_previous_free = ptr_next_free;
-        ptr_next_free = (uint16_t *)ptr_next_free;
-    } while (*ptr_next_free != 0);
-
-    // Reorganizing pointers
-    *(ptr_old_block + 1) = *ptr_next_free;
-
-    // Is merger with next required ?
-    if (offset + *(ptr_old_block) == ((uint8_t *)ptr_next_free - (uint8_t *)start))
-    {
-        // Add next_free size to old size
-        *ptr_old_block += *ptr_next_free;
-        // Old point to next of next
-        *(ptr_old_block + 1) = *(ptr_next_free + 1);
+        prev_free_block = next_free_block;
+        next_free_block = (uint16_t *)((uint8_t *)next_free_block + *(next_free_block + 1));
     }
 
-    // Is merger with previous required ?
-    if ((((uint8_t *)ptr_previous_free - (uint8_t *)start) + *(ptr_previous_free)) == offset)
+    // 3 situations:
+
+    printf("Old block: %p\n", old_block);
+    printf("Prev free block: %p\n", prev_free_block);
+    printf("Next free next: %p\n", next_free_block);
+
+    // 1. We can merge the old block, with the one on the right
+    if (((uint8_t *)next_free_block) == (uint8_t *)old_block + *(old_block))
     {
-        // Add old size to previous_free size
-        *(ptr_previous_free) += *(ptr_old_block);
-        // Point to the next of next_free if there was a merger with the next_free
-        *(ptr_previous_free + 1) = *(ptr_old_block + 1);
+        printf("Monkey 1\n");
+        *(old_block + 1) = *(next_free_block + 1) == 0? 0: *old_block + *(next_free_block + 1);
+        *old_block += *next_free_block; // merge sizes
+        next_free_block = *(next_free_block + 1) == 0? NULL: (uint16_t *)(((uint8_t *)old_block) + *(old_block+1));
     }
-    else
+
+    // 2. There is no previous free block
+    if (!prev_free_block) {
+        *start = old_block_offset;
+        printf("Monkey 2\n");
+        *(old_block + 1) = (uint8_t *)next_free_block - (uint8_t *)old_block;
+    } 
+
+    // 3. The old block should be merged the previous block
+    if ( prev_free_block && ((uint8_t *)prev_free_block) + *prev_free_block == (uint8_t *)old_block)
     {
-        *(ptr_previous_free + 1) = offset;
+        printf("Monkey 3\n");
+        *prev_free_block += *old_block;
     }
 }
-
-// // Générer avec ai
-// void my_free(void *pointer)
-// {
-//     const uint16_t HEAP_SIZE = 64000;
-
-//     // Start of the heap
-//     uint16_t *start = (uint16_t *)MY_HEAP;
-
-//     // Pointer to the block to free
-//     uint16_t *block_to_free = ((uint16_t *)pointer) - 1;
-
-//     // Calculate offset of the block to free
-//     uint16_t offset = (uint8_t *)block_to_free - MY_HEAP;
-//     if (offset >= HEAP_SIZE)
-//         return;
-
-//     // Find previous and next free blocks
-//     uint16_t *prev_free_block = NULL;
-//     uint16_t *next_free_block = (uint16_t *)(MY_HEAP + *start);
-
-//     while (next_free_block && ((uint8_t *)next_free_block - MY_HEAP) < offset)
-//     {
-//         prev_free_block = next_free_block;
-//         next_free_block = *(next_free_block + 1) ? (uint16_t *)(MY_HEAP + *(next_free_block + 1)) : NULL;
-//     }
-
-//     // Insert the freed block in the correct position
-//     if (prev_free_block)
-//     {
-//         *(prev_free_block + 1) = offset;
-//     }
-//     else
-//     {
-//         *start = offset;
-//     }
-
-//     *(block_to_free + 1) = next_free_block ? ((uint8_t *)next_free_block - (uint8_t *)(block_to_free) ) : 0;
-
-//     // Merge with next block if possible
-//     if (next_free_block && offset + *block_to_free == (uint8_t *)next_free_block - MY_HEAP)
-//     {
-//         *block_to_free += *next_free_block;
-//         *(block_to_free + 1) = *(next_free_block + 1);
-//     }
-
-//     // Merge with previous block if possible
-//     if (prev_free_block && ((uint8_t *)prev_free_block - MY_HEAP) + *prev_free_block == offset)
-//     {
-//         *prev_free_block += *block_to_free;
-//         *(prev_free_block + 1) = *(block_to_free + 1);
-//     }
-// }
-
-
