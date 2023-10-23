@@ -32,6 +32,9 @@ void *my_malloc(size_t size)
     size = size < MIN_BLOCK_SIZE ? MIN_BLOCK_SIZE : size;
 
     uint16_t *start = (uint16_t *)MY_HEAP;
+    if (*start == 0)
+        return NULL;
+
     uint16_t *current = (uint16_t *)(MY_HEAP + *start);
     uint16_t *prev = NULL;
 

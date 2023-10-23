@@ -70,6 +70,10 @@ int main()
     print_all_blocks();
     (void)wtf;
 
+    char *wtf1 = (char *)my_malloc(6);
+    print_all_blocks();
+    (void)wtf1;
+
     my_init();
     printf("my_init()\n");
     print_all_blocks();
