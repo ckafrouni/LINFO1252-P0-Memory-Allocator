@@ -97,30 +97,46 @@ void my_free(void *pointer)
 
     // 3 situations:
 
-    printf("Old block: %p\n", old_block);
-    printf("Prev free block: %p\n", prev_free_block);
-    printf("Next free next: %p\n", next_free_block);
+    // Find the next free block after old_block
+    uint8_t *next_block = (uint8_t *)old_block + *old_block;
+    int merged_with_next = 0;
 
-    // 1. We can merge the old block, with the one on the right
-    if (((uint8_t *)next_free_block) == (uint8_t *)old_block + *(old_block))
+    // 1. Merge with the next block if possible
+    if (next_free_block && next_block == (uint8_t *)next_free_block)
     {
-        printf("Monkey 1\n");
+        // Update next offset
         *(old_block + 1) = *(next_free_block + 1) == 0? 0: *old_block + *(next_free_block + 1);
-        *old_block += *next_free_block; // merge sizes
-        next_free_block = *(next_free_block + 1) == 0? NULL: (uint16_t *)(((uint8_t *)old_block) + *(old_block+1));
+
+        // Merge sizes
+        *old_block += *next_free_block;
+        merged_with_next = 1;
     }
 
-    // 2. There is no previous free block
-    if (!prev_free_block) {
-        *start = old_block_offset;
-        printf("Monkey 2\n");
-        *(old_block + 1) = (uint8_t *)next_free_block - (uint8_t *)old_block;
-    } 
-
-    // 3. The old block should be merged the previous block
-    if ( prev_free_block && ((uint8_t *)prev_free_block) + *prev_free_block == (uint8_t *)old_block)
+    // 2. Merge with the previous block if possible
+    if (prev_free_block && ((uint8_t *)prev_free_block) + *prev_free_block == (uint8_t *)old_block)
     {
-        printf("Monkey 3\n");
+        printf("Merging with previous\n");
+        // Merge sizes
         *prev_free_block += *old_block;
+        // Update next offset
+        *(prev_free_block + 1) = *(old_block + 1) == 0? 0: *(prev_free_block + 1) + *(old_block + 1);
+        return; // Early return as the block is merged with the previous one
+    }
+
+    // 3. Update start if there's no previous free block
+    if (!prev_free_block)
+    {
+        // Update start
+        *start = old_block_offset;
+        if (!merged_with_next)
+        {
+            // Update next offset
+            *(old_block + 1) = (uint8_t *)next_free_block - (uint8_t *)old_block;
+        }
+    }
+    else
+    {
+        // Update the next offset of the previous free block
+        *(prev_free_block + 1) = (uint8_t *)old_block - (uint8_t *)prev_free_block;
     }
 }

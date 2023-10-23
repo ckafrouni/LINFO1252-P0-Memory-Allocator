@@ -86,18 +86,18 @@ int main()
     print_all_blocks();
 
 
-    // p = (char *)my_malloc(6);
-    // strcpy(p, "Hello");
-    // printf("char *p = (char *)my_malloc(6);\nstrcpy(p, \"Hello\");\n");
-    // print_all_blocks();
+    p = (char *)my_malloc(6);
+    strcpy(p, "Hello");
+    printf("char *p = (char *)my_malloc(6);\nstrcpy(p, \"Hello\");\n");
+    print_all_blocks();
 
-    // q = (char *)my_malloc(7);
-    // strcpy(q, "world!");
-    // printf("q = (char *)my_malloc(7);\nstrcpy(q, \"world!\");\n");
-    // print_all_blocks();
+    q = (char *)my_malloc(7);
+    strcpy(q, "world!");
+    printf("q = (char *)my_malloc(7);\nstrcpy(q, \"world!\");\n");
+    print_all_blocks();
 
-    // char *a = (char *)my_malloc(10);
-    // print_all_blocks();
+    char *a = (char *)my_malloc(10);
+    print_all_blocks();
 
     my_free(pq);
     printf("my_free(pq);\n");
