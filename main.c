@@ -42,10 +42,11 @@ void print_all_blocks()
         printf("\033[33m%%p =\033[0;1m %p\t", current);
         printf("\033[33msize =\033[0;1m %u\t", size);
         printf("\033[33mnext offset =\033[0;1m %u\n", next_offset);
-        
+
         n++;
         current = (uint16_t *)((uint8_t *)current + next_offset);
-        if (n == nMax || next_offset == 0) break;
+        if (n == nMax || next_offset == 0)
+            break;
     }
 
     printf("\033[34m==================\n\n\033[0m");
@@ -84,7 +85,6 @@ int main()
     printf("%d\n", *(uint16_t *)(MY_HEAP + 2));
     printf("my_free(p);\n");
     print_all_blocks();
-
 
     p = (char *)my_malloc(6);
     strcpy(p, "Hello");
