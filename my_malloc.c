@@ -5,11 +5,6 @@
 
 #include "my_malloc.h"
 
-#define HEAP_SIZE 64000
-
-#define METADATA_SIZE 2
-#define MIN_BLOCK_SIZE (2 * METADATA_SIZE) // header, and next offset
-
 uint8_t MY_HEAP[HEAP_SIZE];
 
 /**
@@ -59,7 +54,7 @@ void *my_malloc(size_t size)
 
     uint16_t *start = (uint16_t *)MY_HEAP;
     if (*start == 0)
-        return NULL;
+        return NULL; // TODO: Can the problem come from returning NULL ??
 
     uint16_t *current = (uint16_t *)(MY_HEAP + *start);
     uint16_t *prev = NULL;
@@ -98,7 +93,7 @@ void *my_malloc(size_t size)
             // Update current block
             *current = size;
 
-            return (void *)(current + 1);
+            return (void *)(current + 1); // TODO: When can this return statement returning something outside the heap ??
         }
 
         prev = current;

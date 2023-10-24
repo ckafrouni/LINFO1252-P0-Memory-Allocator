@@ -3,7 +3,12 @@
 
 #include <stdint.h>
 
-extern uint8_t MY_HEAP[64000];
+#define HEAP_SIZE 64000
+
+#define METADATA_SIZE 2
+#define MIN_BLOCK_SIZE (2 * METADATA_SIZE) // header, and next offset
+
+extern uint8_t MY_HEAP[HEAP_SIZE];
 
 // Initialize the memory allocator
 void my_init();
