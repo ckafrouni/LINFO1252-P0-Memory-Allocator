@@ -49,6 +49,8 @@ void my_init()
 
 void *my_malloc(size_t size)
 {
+    if (size == 0)
+        return NULL;
     size += 1 * METADATA_SIZE; // Additional words for header
     size = size < MIN_BLOCK_SIZE ? MIN_BLOCK_SIZE : size;
 
@@ -105,6 +107,8 @@ void *my_malloc(size_t size)
 
 void my_free(void *pointer)
 {
+    if (!pointer || (uint8_t *)pointer < MY_HEAP + 2 || (uint8_t *)pointer > MY_HEAP + HEAP_SIZE - MIN_BLOCK_SIZE)
+        return;
     uint16_t *start = (uint16_t *)MY_HEAP;
     uint16_t *old_block = ((uint16_t *)pointer) - 1;
 

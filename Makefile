@@ -1,15 +1,15 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -g -ggdb3
+CFLAGS=-Wall -Wextra -g -ggdb3 -Wno-unused-variable
 
 EXEC=main
 TESTS=tests
 
 all: $(EXEC) $(TESTS)
 
-$(EXEC): my_malloc.c main.c
+$(EXEC): my_malloc.c utils.h main.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-$(TESTS): my_malloc.c tests.c
+$(TESTS): my_malloc.c utils.h tests.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 run:
