@@ -51,6 +51,7 @@ void *my_malloc(size_t size)
 {
     if (size == 0)
         return NULL;
+        
     size += 1 * METADATA_SIZE; // Additional words for header
     size = size < MIN_BLOCK_SIZE ? MIN_BLOCK_SIZE : size;
 
