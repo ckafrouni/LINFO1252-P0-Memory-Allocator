@@ -7,32 +7,6 @@
 
 uint8_t MY_HEAP[HEAP_SIZE];
 
-/**
- * Test : my_malloc() et my_free() de gros blocs
- * => échoué (0/1) pts)
- * Info:
- * Your code produced a segfault.
- * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
- * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
- * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
- * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
- * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
- * — Une suite de my_malloc()/my_free() dont le total de mémoire allouée est supérieur
- *   à la mémoire disponible a été mal géré par votre programme.
- *   (Libérez-vous correctement vos blocs ?)
- *
- * Test : my_malloc() et my_free() de gros blocs, certains blocs sont remplis avec des 0
- * => échoué (0/1) pts)
- * Info: Your code produced a segfault.
- * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
- * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
- * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
- * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
- * — Un pointeur renvoyé par my_malloc() pointe sur une partie de zone mémoire en dehors de MY_HEAP
- * — Une suite de my_malloc()/my_free() dont le total de mémoire allouée est supérieur à la
- *   mémoire disponible a été mal géré par votre programme.
- *   (Libérez-vous correctement vos blocs ?)
- */
 
 void my_init()
 {
@@ -51,7 +25,7 @@ void *my_malloc(size_t size)
 {
     if (size == 0)
         return NULL;
-        
+
     size += 1 * METADATA_SIZE; // Additional words for header
     size = size < MIN_BLOCK_SIZE ? MIN_BLOCK_SIZE : size;
 
@@ -100,7 +74,7 @@ void *my_malloc(size_t size)
         }
 
         prev = current;
-        current = *(current + 1) == 0 ? NULL : current + *(current + 1);
+        current = *(current + 1) == 0 ? NULL : (uint16_t *)((uint8_t *)current + *(current + 1));
     }
 
     return NULL;
@@ -120,11 +94,11 @@ void my_free(void *pointer)
 
     // Find surrounding free blocks
     uint16_t *prev_free_block = NULL;
-    uint16_t *next_free_block = (uint16_t *)(MY_HEAP + *start);
-    while (next_free_block < old_block)
+    uint16_t *next_free_block = *start == 0 ? NULL : (uint16_t *)(MY_HEAP + *start);
+    while (next_free_block && next_free_block < old_block)
     {
         prev_free_block = next_free_block;
-        next_free_block = (uint16_t *)((uint8_t *)next_free_block + *(next_free_block + 1));
+        next_free_block = *(next_free_block + 1) == 0 ? NULL : (uint16_t *)((uint8_t *)next_free_block + *(next_free_block + 1));
     }
 
     // 3 situations:

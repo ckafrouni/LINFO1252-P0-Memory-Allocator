@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "my_malloc.h": "c",
+        "stdlib.h": "c",
+        "stdio.h": "c",
+        "stdint.h": "c",
+        "string.h": "c",
+        "utils.h": "c",
+        "tests.h": "c"
+    }
+}

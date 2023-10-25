@@ -1,24 +1,25 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -g -ggdb3 -Wno-unused-variable
 
-EXEC=main
-TESTS=tests
+BINDIR=bin
+SRCDIR=src
+TESTDIR=test
 
-all: $(EXEC) $(TESTS)
+TESTBIN=$(BINDIR)/tests
 
-$(EXEC): my_malloc.c utils.h main.c
+all: $(BINDIR) $(TESTBIN)
+
+$(BINDIR):
+	mkdir $@
+
+$(TESTBIN): $(SRCDIR)/my_malloc.c $(TESTDIR)/utils.h $(TESTDIR)/framework.h $(TESTDIR)/tests.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-$(TESTS): my_malloc.c utils.h tests.c
-	$(CC) $(CFLAGS) -o $@ $^
-
-run:
-	make && ./$(EXEC)
-
-test:
-	make && ./$(TESTS)
-
-clean:
-	find . -type f -executable -not -path "./.git/*" -not -name "*.sh" | xargs -r rm
-
+# Commands
 .PHONY: all run test debug clean
+
+test: $(BINDIR) $(TESTBIN)
+	./$(TESTBIN)
+
+clean: 
+	rm -rf $(BINDIR)	

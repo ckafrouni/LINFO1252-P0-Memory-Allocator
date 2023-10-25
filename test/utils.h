@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "my_malloc.h"
+#include "../src/my_malloc.h"
 
 void print_all_blocks()
 {
