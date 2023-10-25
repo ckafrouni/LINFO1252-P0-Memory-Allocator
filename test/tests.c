@@ -10,7 +10,7 @@ int is_pointer_in_heap(void *ptr)
     return _ptr >= MY_HEAP + 4 && _ptr <= MY_HEAP + HEAP_SIZE - MIN_BLOCK_SIZE;
 }
 
-int test_initialising()
+int test_initialising_heap()
 {
     my_init();
 
@@ -160,11 +160,11 @@ int test_filling_free_one_then_fill()
 
 int main()
 {
-    register_test("Initialising heap", test_initialising);
-    register_test("Allocating 0 and 1 byte", test_allocating_0_and_1_byte);
-    register_test("Allocating many small blocks until full", test_alloc_many_small_blocks_until_full);
-    register_test("Allocating many big blocks until not enough space", test_alloc_many_big_blocks_until_not_enough_space);
-    register_test("Free then fill spot", test_filling_free_one_then_fill);
+    REGISTER_TEST(test_initialising_heap);
+    REGISTER_TEST(test_allocating_0_and_1_byte);
+    REGISTER_TEST(test_alloc_many_small_blocks_until_full);
+    REGISTER_TEST(test_alloc_many_big_blocks_until_not_enough_space);
+    REGISTER_TEST(test_filling_free_one_then_fill);
 
     printf("\n");
     run_tests("Testing my_malloc and my_free");
