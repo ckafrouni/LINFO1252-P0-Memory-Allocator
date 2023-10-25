@@ -4,7 +4,8 @@
 #include "../src/my_malloc.h"
 #include "./framework.h"
 
-int is_pointer_in_heap(void *ptr) {
+int is_pointer_in_heap(void *ptr)
+{
     uint8_t *_ptr = (uint8_t *)ptr;
     return _ptr >= MY_HEAP + 4 && _ptr <= MY_HEAP + HEAP_SIZE - MIN_BLOCK_SIZE;
 }
@@ -39,7 +40,7 @@ int test_allocating_0_and_1_byte()
     ptr = my_malloc(1);
     if (ptr == NULL)
         return 0;
-    
+
     if (!is_pointer_in_heap(ptr))
         return 0;
 
@@ -141,7 +142,7 @@ int test_filling_free_one_then_fill()
     my_free(ptr_to_free + 1);
     if (*(uint16_t *)MY_HEAP != METADATA_SIZE)
         return 0;
-    
+
     if (*ptr_to_free != block_size)
         return 0;
 
@@ -156,7 +157,6 @@ int test_filling_free_one_then_fill()
 
     return 1;
 }
-
 
 int main()
 {

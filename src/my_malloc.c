@@ -7,7 +7,6 @@
 
 uint8_t MY_HEAP[HEAP_SIZE];
 
-
 void my_init()
 {
     // Initialize start block to point to 1st free block
@@ -31,7 +30,7 @@ void *my_malloc(size_t size)
 
     uint16_t *start = (uint16_t *)MY_HEAP;
     if (*start == 0)
-        return NULL; // TODO: Can the problem come from returning NULL ??
+        return NULL;
 
     uint16_t *current = (uint16_t *)(MY_HEAP + *start);
     uint16_t *prev = NULL;
@@ -70,7 +69,7 @@ void *my_malloc(size_t size)
             // Update current block
             *current = size;
 
-            return (void *)(current + 1); // TODO: When can this return statement returning something outside the heap ??
+            return (void *)(current + 1);
         }
 
         prev = current;

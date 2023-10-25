@@ -4,6 +4,12 @@
 #include <string.h>
 #include <stdio.h>
 
+#define NUM_FMT "\033[34m#%d\033[0m "
+#define ARROW "\033[34m->\033[0m "
+#define TITLE_FMT "\033[1m'%s'\033[0m "
+#define PASSED "\033[0;32mPASSED\033[0m"
+#define FAILED "\033[0;31mFAILED\033[0m"
+
 #define MAX_TESTS 30
 
 typedef int (*test_func)(void);
@@ -25,8 +31,7 @@ void register_test(char *title, int (*test)())
     }
 
     test_t test_struct = {
-        .func = test
-    };
+        .func = test};
 
     strncpy(test_struct.title, title, 100);
 
@@ -39,7 +44,6 @@ int run_tests(char *title)
     printf("\033[35m================== TESTS ==================\033[0m\n\n");
     printf("\033[1m- %s\n\n\033[0m", title);
 
-
     int passed = 0;
     int failed = 0;
 
@@ -50,12 +54,6 @@ int run_tests(char *title)
         test_t test = tests[i];
         if (test.func == NULL)
             break;
-
-        #define NUM_FMT "\033[34m#%d\033[0m "
-        #define ARROW "\033[34m->\033[0m "
-        #define TITLE_FMT "\033[1m'%s'\033[0m "
-        #define PASSED "\033[0;32mPASSED\033[0m"
-        #define FAILED "\033[0;31mFAILED\033[0m"
 
         num++;
         printf(NUM_FMT, num);
